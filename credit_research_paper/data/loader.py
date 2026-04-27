@@ -13,15 +13,16 @@ TENOR_MAP = dict(zip(TENORS, TENOR_LABELS))
 
 def parse_category(raw: str):
     raw = raw.strip()
-    raw = re.sub(r'^시가평가\s*3사평균\s*', '', raw)
-    raw = re.sub(r'^금투협\s*최종호가\s*', '', raw)
+    # 다양한 출처 prefix 제거
+    for prefix in ['시가평가 3사평균', '금투협 최종호가', '금투협최종호가', '시가평가3사평균']:
+        raw = raw.replace(prefix, '').strip()
     raw = raw.replace('(공모/무보증)', '').strip()
     raw = raw.replace('AA0', 'AA')
 
     if '국고채' in raw:
         sector = '국고채'
         rating = re.sub(r'국고채권?', '', raw).strip()
-        rating = re.sub(r'\(.*?\)', '', rating).strip()
+        rating = re.sub(r'\(.*?\)', '', rating).strip()  # (1년) 등 만기 표기 제거
 
     elif '통안채' in raw or '통화안정' in raw:
         sector = '통안채'
@@ -30,31 +31,31 @@ def parse_category(raw: str):
 
     elif '공사/공단채' in raw:
         sector = '공사/공단채'
-        rating = re.sub(r'공사/공단채\s*', '', raw).strip()
+        rating = raw.replace('공사/공단채', '').strip()
 
     elif '공사채' in raw:
         sector = '공사/공단채'
-        rating = re.sub(r'공사채\s*', '', raw).strip()
+        rating = raw.replace('공사채', '').strip()
 
     elif '은행채' in raw:
         sector = '은행채'
-        rating = raw.split('은행채')[-1].strip()
+        rating = raw.replace('은행채', '').strip()
 
     elif '카드채' in raw:
         sector = '카드채'
-        rating = raw.split('카드채')[-1].strip()
+        rating = raw.replace('카드채', '').strip()
 
     elif '기타금융채' in raw:
         sector = '기타금융채'
-        rating = re.sub(r'기타금융채\s*', '', raw).strip()
+        rating = raw.replace('기타금융채', '').strip()
 
     elif '여전채' in raw:
         sector = '기타금융채'
-        rating = re.sub(r'여전채\s*', '', raw).strip()
+        rating = raw.replace('여전채', '').strip()
 
     elif '회사채' in raw:
         sector = '회사채'
-        rating = re.sub(r'회사채\s*', '', raw).strip()
+        rating = raw.replace('회사채', '').strip()
 
     else:
         sector = raw
